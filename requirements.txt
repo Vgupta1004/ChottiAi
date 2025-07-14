@@ -1,0 +1,5 @@
+fastapi==0.111.0  # License: MIT
+uvicorn==0.29.0    # License: BSD-3-Clause
+langdetect==1.0.9  # License: LGPL-2.1
+googletrans==4.0.0rc1  # License: MIT
+requests==2.31.0   # License: Apache-2.0
