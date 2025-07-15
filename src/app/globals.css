@@ -67,6 +67,25 @@ p {
   color: var(--text-subtle);
 }
 
+.force-dark-text {
+  color: #1F2937 !important;
+}
+
+.force-highlight {
+  color: #3B82F6 !important;
+  font-weight: 600 !important;
+}
+
+.force-dark-cart-name {
+  color: #1F2937 !important;
+  font-weight: 600 !important;
+}
+
+.force-intro-desc {
+  color: #4B5563 !important;
+  font-size: 1.125rem !important;
+}
+
 /* Links */
 a {
   color: #1d4ed8; /* Dark blue for light mode */
@@ -97,4 +116,96 @@ code {
     background: #1e293b;
     color: #f9fafb; /* Light text for dark mode */
   }
+}
+
+/* Custom range slider styles */
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9333ea, #ec4899);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(147, 51, 234, 0.3);
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+}
+
+.slider::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9333ea, #ec4899);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(147, 51, 234, 0.3);
+  transition: all 0.2s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+}
+
+.slider::-webkit-slider-track {
+  background: linear-gradient(to right, #e5e7eb, #d1d5db);
+  border-radius: 10px;
+  height: 8px;
+}
+
+.slider::-moz-range-track {
+  background: linear-gradient(to right, #e5e7eb, #d1d5db);
+  border-radius: 10px;
+  height: 8px;
+  border: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #9333ea, #ec4899);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+}
+
+/* Smooth animations */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+@keyframes fadeSlideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-32px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-down {
+  animation: fadeSlideDown 0.7s cubic-bezier(0.4,0,0.2,1) both;
 }
