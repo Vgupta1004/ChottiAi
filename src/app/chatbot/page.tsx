@@ -28,7 +28,7 @@ function detectLang(text: string): string {
 
 export default function ChatbotPage() {
   const [messages, setMessages] = useState([
-    { from: "bot", text: "Hi! I am ChottiAI. How can I help you today?" },
+    { from: "bot", text: "Hi! I am ChottiAI. How can I help you today?", image: undefined as string | undefined },
   ]);
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
@@ -210,7 +210,7 @@ export default function ChatbotPage() {
   const handleSend = async (msg?: string) => {
     const text = (msg !== undefined ? msg : input).trim();
     if (!text) return;
-    setMessages(msgs => [...msgs, { from: "user", text }]);
+    setMessages(msgs => [...msgs, { from: "user", text, image: undefined }]);
     setInput("");
     try {
       const res = await fetch("/api/chat", {
@@ -220,9 +220,13 @@ export default function ChatbotPage() {
       });
       if (!res.ok) throw new Error("Backend error");
       const data = await res.json();
-      setMessages(msgs => [...msgs, { from: "bot", text: data.response }]);
+      // Support both text and image in bot response
+      setMessages(msgs => [
+        ...msgs,
+        { from: "bot", text: data.response || "", image: data.image || undefined },
+      ]);
     } catch (e) {
-      setMessages(msgs => [...msgs, { from: "bot", text: "Sorry, there was a problem connecting to the server." }]);
+      setMessages(msgs => [...msgs, { from: "bot", text: "Sorry, there was a problem connecting to the server.", image: undefined }]);
     }
   };
 
@@ -231,8 +235,13 @@ export default function ChatbotPage() {
       <div className="relative w-full max-w-2xl min-h-[80vh] flex flex-col bg-white rounded-xl shadow-2xl border border-[#e3e8ee] overflow-hidden">
         {/* Header */}
         <header className="flex items-center gap-3 px-6 py-4 bg-white border-b border-[#e3e8ee]">
-          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-[#4f8cff] to-[#38bdf8] shadow">
-            <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='#fff' className='w-6 h-6'><path strokeLinecap='round' strokeLinejoin='round' d='M7.5 8.25v-.375A2.625 2.625 0 0110.125 5.25h3.75A2.625 2.625 0 0116.5 7.875v.375m-9 0A2.625 2.625 0 005.25 10.875v2.25A2.625 2.625 0 007.875 15.75m0-7.5h8.25m-8.25 0v7.5m8.25-7.5v7.5m0 0A2.625 2.625 0 0018.75 13.125v-2.25A2.625 2.625 0 0016.125 8.25m0 7.5A2.625 2.625 0 0113.5 18.375h-3.75A2.625 2.625 0 017.125 15.75' /></svg>
+          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-[#a78bfa] to-[#7c3aed] shadow">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="16" cy="24" rx="12" ry="5" fill="#a78bfa" />
+              <path d="M8 24c0-6 4-12 8-12s8 6 8 12" stroke="#7c3aed" strokeWidth="2" fill="none" />
+              <path d="M12 24c0-4 2-8 4-8s4 4 4 8" stroke="#7c3aed" strokeWidth="2" fill="none" />
+              <circle cx="16" cy="12" r="2" fill="#7c3aed" />
+            </svg>
           </span>
           <span className="text-2xl font-bold text-[#223046] tracking-tight">Chotti AI</span>
         </header>
@@ -256,6 +265,17 @@ export default function ChatbotPage() {
                 style={{ fontFamily: `'Inter', 'Segoe UI', 'Noto Sans', Arial, sans-serif` }}
               >
                 {msg.text}
+                {/* Render image if present */}
+                {msg.image && (
+                  <div className="mt-3 flex justify-center">
+                    <img
+                      src={msg.image}
+                      alt="Generated visual content"
+                      className="max-w-full max-h-64 rounded-lg border border-[#e3e8ee] shadow"
+                      style={{ display: 'block', margin: '0 auto' }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))}

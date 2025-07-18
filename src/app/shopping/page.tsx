@@ -18,18 +18,31 @@ type Product = {
 type CartItem = Product & { quantity: number };
 
 // Move Header outside of MeeshoClone
-const Header = ({ searchTerm, setSearchTerm, setShowImageUpload, setShowFilters, showFilters, funnelRef }: {
+const Header = ({ searchTerm, setSearchTerm, setShowImageUpload, setShowFilters, showFilters, funnelRef, setShowCart, cart }: {
   searchTerm: string;
   setSearchTerm: (val: string) => void;
   setShowImageUpload: (val: boolean) => void;
   setShowFilters: (val: boolean) => void;
   showFilters: boolean;
   funnelRef: React.RefObject<HTMLButtonElement | null>;
+  setShowCart: (val: boolean) => void;
+  cart: CartItem[];
 }) => (
   <header className="bg-white shadow-lg rounded-b-xl sticky top-0 z-50">
     <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <h1 className="text-3xl font-extrabold text-purple-700 tracking-tight">Chotti AI</h1>
+        <h1 className="text-3xl font-extrabold text-purple-700 tracking-tight flex items-center gap-2">
+          {/* Rural artisan icon: basket */}
+          <span className="inline-block align-middle">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="16" cy="24" rx="12" ry="5" fill="#a78bfa" />
+              <path d="M8 24c0-6 4-12 8-12s8 6 8 12" stroke="#7c3aed" strokeWidth="2" fill="none" />
+              <path d="M12 24c0-4 2-8 4-8s4 4 4 8" stroke="#7c3aed" strokeWidth="2" fill="none" />
+              <circle cx="16" cy="12" r="2" fill="#7c3aed" />
+            </svg>
+          </span>
+          Chotti AI
+        </h1>
         <div className="hidden md:flex relative w-96">
           <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
           <input
@@ -73,7 +86,18 @@ const Header = ({ searchTerm, setSearchTerm, setShowImageUpload, setShowFilters,
           <Filter className="h-5 w-5" />
           <span className="hidden md:block font-medium">Filters</span>
         </button>
-        {/* Cart button removed from Header for now to fix linter errors */}
+        {/* Cart button restored here */}
+        <button
+          onClick={() => setShowCart(true)}
+          className="relative flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition"
+          aria-label="Open cart"
+        >
+          <ShoppingCart className="h-5 w-5" />
+          <span className="hidden md:block font-medium">Cart</span>
+          {cart.length > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold shadow">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
+          )}
+        </button>
       </div>
     </div>
     {/* Mobile Search */}
@@ -389,37 +413,42 @@ const MeeshoClone = () => {
         {cart.length === 0 ? (
           <p>Your cart is empty.</p>
         ) : (
-          <div className="space-y-4 flex-1 overflow-y-auto">
-            {cart.map(item => (
-              <div key={item.id} className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md mr-4" />
-                  <div className="flex flex-col min-w-0">
-                    <p className="text-lg truncate force-dark-cart-name">{item.name}</p>
-                    <p className="force-dark-cart-name whitespace-nowrap">₹{item.price} x {item.quantity}</p>
+          <>
+            <div className="space-y-4 flex-1 overflow-y-auto">
+              {cart.map(item => (
+                <div key={item.id} className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md mr-4" />
+                    <div className="flex flex-col min-w-0">
+                      <p className="text-lg truncate force-dark-cart-name">{item.name}</p>
+                      <p className="force-dark-cart-name whitespace-nowrap">₹{item.price} x {item.quantity}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-2 bg-gray-200 rounded-full">
+                      <Minus className="h-4 w-4 text-gray-600" />
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-2 bg-gray-200 rounded-full">
+                      <Plus className="h-4 w-4 text-gray-600" />
+                    </button>
+                    <button onClick={() => removeFromCart(item.id)} className="p-2 text-red-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-2 bg-gray-200 rounded-full">
-                    <Minus className="h-4 w-4 text-gray-600" />
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-2 bg-gray-200 rounded-full">
-                    <Plus className="h-4 w-4 text-gray-600" />
-                  </button>
-                  <button onClick={() => removeFromCart(item.id)} className="p-2 text-red-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                  </button>
-                </div>
+              ))}
+              <div className="flex justify-between items-center mt-4">
+                <p className="text-lg font-semibold">Total: ₹{getTotalPrice()}</p>
+                <button className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 font-semibold">
+                  Proceed to Payment
+                </button>
               </div>
-            ))}
-            <div className="flex justify-between items-center mt-4">
-              <p className="text-lg font-semibold">Total: ₹{getTotalPrice()}</p>
-              <button className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
-                Proceed to Payment
-              </button>
             </div>
-          </div>
+            <div className="flex justify-end mt-2 border-t pt-4 bg-white sticky bottom-0 z-10">
+              <p className="text-base font-medium text-purple-500" style={{fontWeight: 500, color: '#a78bfa', fontSize: '1rem', margin: 0, padding: 0, letterSpacing: '0.01em', fontFamily: 'inherit'}}>Total: ₹{getTotalPrice()}</p>
+            </div>
+          </>
         )}
       </div>
     ) : null
@@ -427,37 +456,60 @@ const MeeshoClone = () => {
 
   // ProductDetail component
   const ProductDetail = () => (
-    <div className="fixed inset-0 bg-white p-6 lg:w-1/2 lg:static lg:p-0 lg:h-full lg:overflow-y-auto z-50">
-      {selectedProduct && (
-        <div>
-          <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-64 object-cover rounded-lg mb-4" />
-          <h2 className="text-3xl font-bold mb-2">{selectedProduct.name}</h2>
-          <p className="text-gray-800 font-bold text-2xl mb-2">₹{selectedProduct.price}</p>
-          <p className="text-gray-600 line-through">₹{selectedProduct.originalPrice}</p>
-          <div className="flex items-center mt-2 text-yellow-500 text-sm">
-            <Star className="h-4 w-4 mr-1" />
-            {selectedProduct.rating?.toFixed(1)} ({selectedProduct.reviews})
+    selectedProduct ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/10">
+        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 flex flex-col md:flex-row overflow-hidden">
+          {/* Close button */}
+          <button
+            onClick={() => setSelectedProduct(null)}
+            className="absolute top-4 right-4 text-gray-400 hover:text-purple-600 rounded-full p-2 cursor-pointer z-10"
+            aria-label="Close product details"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+          {/* Product Image */}
+          <div className="md:w-1/2 flex items-center justify-center bg-gray-50 p-6">
+            <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-80 object-contain rounded-xl shadow" />
           </div>
-          {/* Product.description does not exist, so remove or replace this line */}
-          {/* <p className="text-gray-700 mt-4">{selectedProduct.description}</p> */}
-          <button
-            onClick={() => addToCart(selectedProduct)}
-            className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-          >
-            Add to Cart
-          </button>
-          <button
-            onClick={() => toggleWishlist(selectedProduct)}
-            className="mt-2 w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300"
-          >
-            {wishlist.some(item => item.id === selectedProduct.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
-          </button>
-          <button className="mt-4 w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700">
-            Buy Now
-          </button>
+          {/* Product Info */}
+          <div className="md:w-1/2 flex flex-col p-6 gap-4">
+            <h2 className="text-3xl font-bold mb-2 text-gray-900">{selectedProduct.name}</h2>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-2xl font-extrabold text-purple-700">₹{selectedProduct.price}</span>
+              <span className="text-lg text-gray-400 line-through">₹{selectedProduct.originalPrice}</span>
+              <span className="text-md text-green-600 font-semibold">
+                {Math.round(((selectedProduct.originalPrice - selectedProduct.price) / selectedProduct.originalPrice) * 100)}% off
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mb-4">
+              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+              <span className="text-base text-gray-700 font-semibold">{selectedProduct.rating?.toFixed(1)}</span>
+              <span className="text-sm text-gray-400">({selectedProduct.reviews} reviews)</span>
+            </div>
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3 mt-2">
+              <button
+                onClick={() => addToCart(selectedProduct)}
+                className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-bold text-lg transition cursor-pointer"
+              >
+                Add to Cart
+              </button>
+              <button
+                onClick={() => toggleWishlist(selectedProduct)}
+                className="w-full bg-gray-100 text-purple-700 py-3 rounded-lg hover:bg-purple-200 font-bold text-lg transition cursor-pointer border border-purple-200"
+              >
+                {wishlist.some(item => item.id === selectedProduct.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              </button>
+              <button
+                className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-bold text-lg transition cursor-pointer"
+              >
+                Buy Now
+              </button>
+            </div>
+          </div>
         </div>
-      )}
-    </div>
+      </div>
+    ) : null
   );
 
   // Payment component
@@ -508,6 +560,8 @@ const MeeshoClone = () => {
         setShowFilters={setShowFilters}
         showFilters={showFilters}
         funnelRef={funnelRef}
+        setShowCart={setShowCart}
+        cart={cart}
       />
       <div className="flex relative">
         {/* FilterPanel: only visible when showFilters is true, overlays content */}

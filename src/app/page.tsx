@@ -45,7 +45,15 @@ function getLabels(lang: string | null) {
 
 const Logo = () => (
   <div className={`flex items-center gap-2 text-2xl font-bold ${playfair.variable} font-serif`}>
-    <TbLamp className="text-3xl" />
+    {/* Rural artisan icon: basket */}
+    <span className="inline-block align-middle">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="16" cy="24" rx="12" ry="5" fill="#a78bfa" />
+        <path d="M8 24c0-6 4-12 8-12s8 6 8 12" stroke="#7c3aed" strokeWidth="2" fill="none" />
+        <path d="M12 24c0-4 2-8 4-8s4 4 4 8" stroke="#7c3aed" strokeWidth="2" fill="none" />
+        <circle cx="16" cy="12" r="2" fill="#7c3aed" />
+      </svg>
+    </span>
     <span>ChottiAI</span>
   </div>
 );
@@ -55,7 +63,7 @@ const NavLinks = () => (
     <Link href="/" className="px-2 py-1 rounded hover:underline hover:text-[#3B82F6] transition-colors duration-200">ChottiAI</Link>
     <Link href="/shopping" className="px-2 py-1 rounded hover:underline hover:text-[#3B82F6] transition-colors duration-200">Shopping Zone</Link>
     <button className="px-2 py-1 rounded bg-transparent border-none hover:underline hover:text-[#3B82F6] transition-colors duration-200">Skills</button>
-    <button className="px-2 py-1 rounded bg-transparent border-none hover:underline hover:text-[#3B82F6] transition-colors duration-200">Guidance</button>
+    <Link href="/noticeboard" className="px-2 py-1 rounded hover:underline hover:text-[#3B82F6] transition-colors duration-200">Bazaar Noticeboard</Link>
     <button className="px-2 py-1 rounded bg-transparent border-none hover:underline hover:text-[#3B82F6] transition-colors duration-200">About</button>
   </nav>
 );
@@ -217,9 +225,23 @@ export default function Page() {
         </div>
       </main>
       <footer className={`w-full py-5 bg-[#1F2937] text-center text-base text-white font-semibold tracking-wide border-t border-[#E5E7EB] z-10 relative ${inter.variable} font-sans`}>
-        <TbLamp className="inline-block mr-2 align-middle" />
+        <span className="inline-block align-middle mr-2">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="16" cy="24" rx="12" ry="5" fill="#a78bfa" />
+            <path d="M8 24c0-6 4-12 8-12s8 6 8 12" stroke="#7c3aed" strokeWidth="2" fill="none" />
+            <path d="M12 24c0-4 2-8 4-8s4 4 4 8" stroke="#7c3aed" strokeWidth="2" fill="none" />
+            <circle cx="16" cy="12" r="2" fill="#7c3aed" />
+          </svg>
+        </span>
         <span>ChottiAI - Empowering Rural India</span>
-        <TbLamp className="inline-block ml-2 align-middle" />
+        <span className="inline-block align-middle ml-2">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="16" cy="24" rx="12" ry="5" fill="#a78bfa" />
+            <path d="M8 24c0-6 4-12 8-12s8 6 8 12" stroke="#7c3aed" strokeWidth="2" fill="none" />
+            <path d="M12 24c0-4 2-8 4-8s4 4 4 8" stroke="#7c3aed" strokeWidth="2" fill="none" />
+            <circle cx="16" cy="12" r="2" fill="#7c3aed" />
+          </svg>
+        </span>
       </footer>
     </div>
   );
