@@ -62,6 +62,12 @@ export default function ChatbotPage() {
     { code: 'pa-IN', name: 'Punjabi (India)', flag: '🇮🇳' }
   ];
 
+  // Function to get selected language name from code
+  const getSelectedLanguageName = (langCode: string): string => {
+    const selectedLang = voiceLanguages.find(lang => lang.code === langCode);
+    return selectedLang ? selectedLang.name : 'English (India)';
+  };
+
   // Load available voices for TTS
   useEffect(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -212,7 +218,47 @@ export default function ChatbotPage() {
     if (!text) return;
     setMessages(msgs => [...msgs, { from: "user", text, image: undefined }]);
     setInput("");
+    
     try {
+      // First, translate the user input
+      console.log('🔄 Translating user input:', text);
+      
+      const translationResponse = await fetch('/api/language', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      
+      if (translationResponse.ok) {
+        const translationData = await translationResponse.json();
+        
+        // Use the user's selected language from dropdown instead of detected language
+        const userSelectedLanguage = getSelectedLanguageName(voiceLanguage);
+        
+        // Create simplified JSON payload with user-selected language and translated text
+        const simplifiedData = {
+          language: userSelectedLanguage,
+          translatedText: translationData.translatedText
+        };
+        
+        // Send user-selected language and translated text as JSON
+        console.log('📤 Sending user-selected language data:', simplifiedData);
+        
+        fetch('/api/translated-messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(simplifiedData),
+        }).catch(err => console.error('Error sending translated message:', err));
+        
+        // Log translation info to console
+        console.log('🌐 Translation Results:');
+        console.log('- User Selected Language:', userSelectedLanguage);
+        console.log('- Dropdown Value:', voiceLanguage);
+        console.log('- Detected Language:', translationData.detectedLanguage);
+        console.log('- Translated Text:', translationData.translatedText);
+      }
+      
+      // Continue with normal chatbot flow
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -226,6 +272,7 @@ export default function ChatbotPage() {
         { from: "bot", text: data.response || "", image: data.image || undefined },
       ]);
     } catch (e) {
+      console.error('Error in handleSend:', e);
       setMessages(msgs => [...msgs, { from: "bot", text: "Sorry, there was a problem connecting to the server.", image: undefined }]);
     }
   };
@@ -288,7 +335,12 @@ export default function ChatbotPage() {
           {/* Language dropdown for STT */}
           <select
             value={voiceLanguage}
-            onChange={e => setVoiceLanguage(e.target.value)}
+            onChange={e => {
+              setVoiceLanguage(e.target.value);
+              console.log('🎯 Language dropdown changed to:', e.target.value);
+              const selectedLang = voiceLanguages.find(lang => lang.code === e.target.value);
+              console.log('🎯 Selected language name:', selectedLang?.name);
+            }}
             className="rounded-lg border border-[#4f8cff] px-3 py-2 bg-white text-[#223046] font-sans focus:ring-2 focus:ring-[#4f8cff] focus:border-[#4f8cff] transition text-sm shadow-sm"
             style={{ minWidth: 120, fontFamily: `'Inter', 'Segoe UI', 'Noto Sans', Arial, sans-serif` }}
             aria-label="Select speech recognition language"
