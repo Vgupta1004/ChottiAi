@@ -107,8 +107,8 @@ ChottiAi/
 ## 🌍 Deployment
 
 - **Frontend:** Deployed on Vercel at [https://chotti-ai.vercel.app/](https://chotti-ai.vercel.app/)
-- **Backend:** Deploy using your preferred method (e.g., Render, Railway, EC2, etc.).
-  - Update the frontend API URL in your environment variables or config if deploying backend elsewhere.
+- **Backend:** Deployed on Railway.
+  - If you deploy the backend elsewhere, update the frontend API URL in your environment variables or config.
 
 ---
 
