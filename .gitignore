@@ -1,7 +1,7 @@
 # Python / Backend
 /backend/env/
 /backend/__pycache__/
-/backend/.venv/
+/backend/.env/
 
 # Next.js / Frontend
 /frontend/.next/
