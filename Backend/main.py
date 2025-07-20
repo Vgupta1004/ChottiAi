@@ -24,6 +24,8 @@ origins = [
     "https://chotti-ai.vercel.app",
     "https://chottiai-production.up.railway.app",
     "http://localhost:3000",  # The address of your Next.js app
+    "https://chotti-ai-git-main-vyaptigs-projects.vercel.app", # Specific preview domain for main branch
+    "https://*-vyaptigs-projects.vercel.app",  
 ]
 
 app.add_middleware(
