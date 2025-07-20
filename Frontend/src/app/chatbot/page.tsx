@@ -30,6 +30,7 @@ function detectLang(text: string): string {
 export default function ChatbotPage() {
 
   const backendUrl = "https://chottiai-backend.onrender.com";
+  
 
   const [messages, setMessages] = useState([
     { from: "bot", text: "Hi! I am ChottiAI. How can I help you today?", image: undefined as string[] | undefined },
