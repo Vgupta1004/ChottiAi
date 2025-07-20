@@ -33,29 +33,11 @@
 
 # image_gen_utils.py
 
-import os
-from huggingface_hub import InferenceClient
-
-HF_TOKEN = os.getenv("HUGGINGFACE_API_KEY")
-client = InferenceClient(token=HF_TOKEN)
-
-def generate_image_from_prompt(prompt, filename="output.png"):
-    try:
-        image = client.text_to_image(prompt=prompt, guidance_scale=7.5)
-        image.save(filename)
-        print(f"✅ Saved: {filename}")
-        return filename
-    except Exception as e:
-        print("❌ HF error:", e)
-        return None
-
-# image_gen_utils.py
-
 # import os
 # from huggingface_hub import InferenceClient
 
 # HF_TOKEN = os.getenv("HUGGINGFACE_API_KEY")
-# client = InferenceClient(model="stabilityai/stable-diffusion-2-1", token=HF_TOKEN)
+# client = InferenceClient(token=HF_TOKEN)
 
 # def generate_image_from_prompt(prompt, filename="output.png"):
 #     try:
@@ -66,3 +48,26 @@ def generate_image_from_prompt(prompt, filename="output.png"):
 #     except Exception as e:
 #         print("❌ HF error:", e)
 #         return None
+
+
+import os
+from huggingface_hub import InferenceClient
+
+# FIX 1: Make sure you are using the correct variable name from your .env and Render settings.
+HF_TOKEN = os.getenv("HF_TOKEN")
+client = InferenceClient(token=HF_TOKEN)
+
+def generate_image_from_prompt(prompt, filename="output.png"):
+    try:
+        # FIX 2: Explicitly use a smaller, more memory-efficient image model.
+        image = client.text_to_image(
+            prompt,
+            model="runwayml/stable-diffusion-v1-5", # A smaller, more stable model
+            guidance_scale=7.5
+        )
+        image.save(filename)
+        print(f"✅ Saved: {filename}")
+        return filename
+    except Exception as e:
+        print("❌ HF error:", e)
+        return None

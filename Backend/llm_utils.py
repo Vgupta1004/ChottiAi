@@ -67,7 +67,8 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 
 # With a Pro account, you can use powerful models. Mistral is an excellent choice.
 # Other great options: 'meta-llama/Meta-Llama-3-8B-Instruct'
-MODEL_ID = "mistralai/Mistral-7B-Instruct-v0.2"
+# MODEL_ID = "mistralai/Mistral-7B-Instruct-v0.2"
+MODEL_ID = "google/gemma-2b-it"
 
 if not HF_TOKEN:
     raise ValueError("Hugging Face token not found. Please add HF_TOKEN to your .env file.")
