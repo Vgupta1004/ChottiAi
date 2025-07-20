@@ -30,7 +30,7 @@ function detectLang(text: string): string {
 export default function ChatbotPage() {
 
   // const backendUrl = "https://chottiai-backend.onrender.com";
-  const backendUrl = "chottiai-production.up.railway.app";
+  const backendUrl = "https://chottiai-production.up.railway.app";
   
 
   const [messages, setMessages] = useState([
