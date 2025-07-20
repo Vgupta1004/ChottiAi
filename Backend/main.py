@@ -22,6 +22,7 @@ app = FastAPI(
 
 origins = [
     "https://chotti-ai.vercel.app",
+    "https://chottiai-production.up.railway.app",
     "http://localhost:3000",  # The address of your Next.js app
 ]
 
