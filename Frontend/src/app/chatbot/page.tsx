@@ -443,6 +443,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from 'react-markdown';
+import BackToHomeButton from "../components/BackToHomeButton";
 
 // TypeScript declarations for Web Speech API
 // (if not already present)
@@ -744,7 +745,7 @@ export default function ChatbotPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#f5f7fa] font-sans" style={{ fontFamily: `'Inter', 'Segoe UI', 'Noto Sans', Arial, sans-serif` }}>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#f5f7fa] font-sans" style={{ fontFamily: `'Inter', 'Segoe UI', 'Noto Sans', Arial, sans-serif` }}>
       <div className="relative w-full max-w-2xl min-h-[80vh] flex flex-col bg-white rounded-xl shadow-2xl border border-[#e3e8ee] overflow-hidden">
         {/* Header */}
         <header className="flex items-center gap-3 px-6 py-4 bg-white border-b border-[#e3e8ee]">
@@ -777,8 +778,10 @@ export default function ChatbotPage() {
     }`}
     style={{ fontFamily: `'Inter', 'Segoe UI', 'Noto Sans', Arial, sans-serif` }}
 >
-          <div className="prose max-w-full break-words text-[#223046]">
-    <ReactMarkdown>{msg.text}</ReactMarkdown>
+          <div className="prose max-w-full break-words" style={{ color: '#000', opacity: 1, fontFamily: `'Inter', 'Segoe UI', 'Noto Sans', Arial, sans-serif`, fontWeight: 500, background: 'none', boxShadow: 'none', textShadow: 'none', textAlign: 'left', lineHeight: 1.6, wordBreak: 'break-word', whiteSpace: 'pre-line', textRendering: 'optimizeLegibility', MozOsxFontSmoothing: 'grayscale', WebkitFontSmoothing: 'antialiased', colorScheme: 'light' }}>
+    <span style={{ color: '#000', WebkitTextFillColor: 'black', fontWeight: 500, background: 'none', boxShadow: 'none', textShadow: 'none', textAlign: 'left', lineHeight: 1.6, wordBreak: 'break-word', whiteSpace: 'pre-line', textRendering: 'optimizeLegibility', MozOsxFontSmoothing: 'grayscale', WebkitFontSmoothing: 'antialiased', colorScheme: 'light' }}>
+      <ReactMarkdown>{msg.text}</ReactMarkdown>
+    </span>
 </div>
                 {/* Render image if present */}
                 {msg.image && msg.image.length > 0 && (
@@ -879,6 +882,7 @@ export default function ChatbotPage() {
           </button>
         </form>
       </div>
+      <BackToHomeButton />
     </div>
   );
 }

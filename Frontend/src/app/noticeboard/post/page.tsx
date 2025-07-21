@@ -8,8 +8,68 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Select } from "../components/ui/select";
-import { ArrowLeft, Send, User, MessageSquare, MapPin } from "lucide-react";
+import { ArrowLeft, Send, User, MessageSquare, MapPin, Mic } from "lucide-react";
 import { noticeService } from "../services/noticeService";
+import { useSearchParams } from "next/navigation";
+import { useRef } from "react";
+
+const translations: { [key: string]: { [key: string]: string } } = {
+  en: {
+    postToBazaar: "Post to Bazaar",
+    share: "Share your needs, offers, or announcements",
+    createNotice: "Create Notice",
+    yourName: "Your Name",
+    region: "Region",
+    address: "Address (optional)",
+    city: "City",
+    contact: "Contact Info",
+    yourMessage: "Your Message",
+    post: "Post to Bazaar",
+    posting: "Posting...",
+    tips: "💡 Tips for better notices:",
+    tip1: "• Be specific about quantities, timelines, and requirements",
+    tip2: "• Include contact preferences in your message",
+    tip3: "• Mention if you're flexible on pricing or terms",
+    tip4: "• Use clear, simple language that everyone can understand"
+  },
+  hi: {
+    postToBazaar: "बाज़ार में पोस्ट करें",
+    share: "अपनी ज़रूरतें, ऑफ़र या घोषणाएँ साझा करें",
+    createNotice: "नोटिस बनाएँ",
+    yourName: "आपका नाम",
+    region: "क्षेत्र",
+    address: "पता (वैकल्पिक)",
+    city: "शहर",
+    contact: "संपर्क जानकारी",
+    yourMessage: "आपका संदेश",
+    post: "बाज़ार में पोस्ट करें",
+    posting: "पोस्ट हो रहा है...",
+    tips: "💡 बेहतर नोटिस के लिए सुझाव:",
+    tip1: "• मात्रा, समयसीमा और आवश्यकताओं के बारे में स्पष्ट रहें",
+    tip2: "• अपने संदेश में संपर्क वरीयताएँ शामिल करें",
+    tip3: "• यदि आप मूल्य या शर्तों पर लचीले हैं तो उल्लेख करें",
+    tip4: "• स्पष्ट, सरल भाषा का उपयोग करें जिसे हर कोई समझ सके"
+  },
+  ta: {
+    postToBazaar: "பஜாரில் இடுக",
+    share: "உங்கள் தேவைகள், சலுகைகள் அல்லது அறிவிப்புகளை பகிர்க",
+    createNotice: "அறிவிப்பு உருவாக்குக",
+    yourName: "உங்கள் பெயர்",
+    region: "பகுதி",
+    address: "முகவரி (விரும்பினால்)",
+    city: "நகரம்",
+    contact: "தொடர்பு தகவல்",
+    yourMessage: "உங்கள் செய்தி",
+    post: "பஜாரில் இடுக",
+    posting: "இடுகிறது...",
+    tips: "💡 சிறந்த அறிவிப்புகளுக்கான குறிப்புகள்:",
+    tip1: "• அளவு, காலவரையறை மற்றும் தேவைகள் குறித்து தெளிவாக இருங்கள்",
+    tip2: "• உங்கள் செய்தியில் தொடர்பு விருப்பங்களை சேர்க்கவும்",
+    tip3: "• நீங்கள் விலையிலும் விதிகளிலும் நெகிழ்வாக இருந்தால் குறிப்பிடவும்",
+    tip4: "• அனைவரும் புரிந்துகொள்ளும் தெளிவான, எளிய மொழியை பயன்படுத்தவும்"
+  }
+};
+
 // import { useToast } from "../hooks/use-toast"; // Uncomment if you have a toast hook
 
 const Post = () => {
@@ -31,8 +91,40 @@ const Post = () => {
     contact: '',
     message: ''
   });
+  const [isListening, setIsListening] = useState<{ [key: string]: boolean }>({});
+  const recognitionRef = useRef<any>(null);
 
   const regions = noticeService.getRegions().filter(region => region !== "All Regions");
+
+  // Map app language to Web Speech API language code
+  const langMap: { [key: string]: string } = { en: "en-IN", hi: "hi-IN", ta: "ta-IN" };
+
+  // Voice input handler
+  const handleVoiceInput = (field: string) => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = langMap[language] || 'en-IN';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    setIsListening((prev) => ({ ...prev, [field]: true }));
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setFormData((prev) => ({ ...prev, [field]: transcript }));
+      setIsListening((prev) => ({ ...prev, [field]: false }));
+    };
+    recognition.onerror = () => {
+      setIsListening((prev) => ({ ...prev, [field]: false }));
+    };
+    recognition.onend = () => {
+      setIsListening((prev) => ({ ...prev, [field]: false }));
+    };
+    recognition.start();
+    recognitionRef.current = recognition;
+  };
 
   const validate = () => {
     const newErrors: typeof errors = { name: '', region: '', city: '', contact: '', message: '' };
@@ -86,6 +178,9 @@ const Post = () => {
     }
   };
 
+  const searchParams = useSearchParams();
+  const language = searchParams.get("lang") || "en";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-white flex flex-col items-center justify-center py-8">
       {/* Artisan Icon Branding */}
@@ -112,9 +207,9 @@ const Post = () => {
           </Button>
           <div>
             <h1 className="text-3xl font-extrabold bg-gradient-to-r from-orange-500 to-yellow-400 bg-clip-text text-transparent tracking-tight">
-              Post to Bazaar
+              {translations[language].postToBazaar}
             </h1>
-            <p className="text-base text-orange-600 font-medium">Share your needs, offers, or announcements</p>
+            <p className="text-base text-orange-600 font-medium">{translations[language].share}</p>
           </div>
         </div>
         {/* Form Card */}
@@ -122,7 +217,7 @@ const Post = () => {
           <CardHeader className="pb-6">
             <CardTitle className="flex items-center gap-2 text-xl text-orange-700 font-bold">
               <MessageSquare className="h-5 w-5 text-orange-500" />
-              Create Notice
+              {translations[language].createNotice}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -131,11 +226,14 @@ const Post = () => {
               <div className="space-y-2">
                 <Label htmlFor="name" className="flex items-center gap-2 text-sm font-semibold text-black">
                   <User className="h-4 w-4 text-orange-500" />
-                  Your Name
+                  {translations[language].yourName}
+                 <button type="button" onClick={() => handleVoiceInput('name')} className={`ml-2 p-1 rounded-full border ${isListening['name'] ? 'bg-orange-200 animate-pulse' : 'bg-white'} focus:outline-none`} aria-label="Speak Name">
+                   <Mic className={`h-4 w-4 ${isListening['name'] ? 'text-orange-600' : 'text-orange-400'}`} />
+                 </button>
                 </Label>
                 <Input
                   id="name"
-                  placeholder="Enter your name"
+                  placeholder={translations[language].yourName}
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   className={`h-12 border-orange-200 focus:ring-2 focus:ring-orange-400 text-black placeholder:text-orange-300 bg-orange-50 ${errors.name ? 'border-2 border-orange-500' : ''}`}
@@ -146,7 +244,10 @@ const Post = () => {
               <div className="space-y-2">
                 <Label htmlFor="region" className="flex items-center gap-2 text-sm font-semibold text-black">
                   <MapPin className="h-4 w-4 text-orange-500" />
-                  Region
+                  {translations[language].region}
+                 <button type="button" onClick={() => handleVoiceInput('region')} className={`ml-2 p-1 rounded-full border ${isListening['region'] ? 'bg-orange-200 animate-pulse' : 'bg-white'} focus:outline-none`} aria-label="Speak Region">
+                   <Mic className={`h-4 w-4 ${isListening['region'] ? 'text-orange-600' : 'text-orange-400'}`} />
+                 </button>
                 </Label>
                 <Select
                   id="region"
@@ -154,7 +255,7 @@ const Post = () => {
                   onChange={e => setFormData(prev => ({ ...prev, region: e.target.value }))}
                   className={`h-12 border-orange-200 focus:ring-2 focus:ring-orange-400 text-black bg-orange-50 ${errors.region ? 'border-2 border-orange-500' : ''}`}
                 >
-                  <option value="" disabled>Select your region</option>
+                  <option value="" disabled>{translations[language].region}</option>
                   {regions.map((region) => (
                     <option key={region} value={region}>{region}</option>
                   ))}
@@ -164,11 +265,14 @@ const Post = () => {
               {/* Address Field (optional) */}
               <div className="space-y-2">
                 <Label htmlFor="address" className="flex items-center gap-2 text-sm font-semibold text-black">
-                  Address (optional)
+                  {translations[language].address}
+                 <button type="button" onClick={() => handleVoiceInput('address')} className={`ml-2 p-1 rounded-full border ${isListening['address'] ? 'bg-orange-200 animate-pulse' : 'bg-white'} focus:outline-none`} aria-label="Speak Address">
+                   <Mic className={`h-4 w-4 ${isListening['address'] ? 'text-orange-600' : 'text-orange-400'}`} />
+                 </button>
                 </Label>
                 <Input
                   id="address"
-                  placeholder="Enter address (optional)"
+                  placeholder={translations[language].address}
                   value={formData.address}
                   onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                   className="h-12 border-orange-200 focus:ring-2 focus:ring-orange-400 text-black placeholder:text-orange-300 bg-orange-50"
@@ -177,11 +281,14 @@ const Post = () => {
               {/* City Field */}
               <div className="space-y-2">
                 <Label htmlFor="city" className="flex items-center gap-2 text-sm font-semibold text-black">
-                  City
+                  {translations[language].city}
+                 <button type="button" onClick={() => handleVoiceInput('city')} className={`ml-2 p-1 rounded-full border ${isListening['city'] ? 'bg-orange-200 animate-pulse' : 'bg-white'} focus:outline-none`} aria-label="Speak City">
+                   <Mic className={`h-4 w-4 ${isListening['city'] ? 'text-orange-600' : 'text-orange-400'}`} />
+                 </button>
                 </Label>
                 <Input
                   id="city"
-                  placeholder="Enter city"
+                  placeholder={translations[language].city}
                   value={formData.city}
                   onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
                   className={`h-12 border-orange-200 focus:ring-2 focus:ring-orange-400 text-black placeholder:text-orange-300 bg-orange-50 ${errors.city ? 'border-2 border-orange-500' : ''}`}
@@ -192,11 +299,11 @@ const Post = () => {
               {/* Contact Field */}
               <div className="space-y-2">
                 <Label htmlFor="contact" className="flex items-center gap-2 text-sm font-semibold text-black">
-                  Contact Info
+                  {translations[language].contact}
                 </Label>
                 <Input
                   id="contact"
-                  placeholder="Enter phone, email, or other contact info"
+                  placeholder={translations[language].contact}
                   value={formData.contact}
                   onChange={(e) => setFormData(prev => ({ ...prev, contact: e.target.value }))}
                   className={`h-12 border-orange-200 focus:ring-2 focus:ring-orange-400 text-black placeholder:text-orange-300 bg-orange-50 ${errors.contact ? 'border-2 border-orange-500' : ''}`}
@@ -207,12 +314,15 @@ const Post = () => {
               {/* Message Field */}
               <div className="space-y-2">
                 <Label htmlFor="message" className="flex items-center gap-2 text-sm font-semibold text-black">
-                  <MessageSquare className="h-4 w-4 text-orange-500" />
-                  Your Message
+                  <MessageSquare className="h-5 w-5 text-orange-500" />
+                  {translations[language].yourMessage}
+                 <button type="button" onClick={() => handleVoiceInput('message')} className={`ml-2 p-1 rounded-full border ${isListening['message'] ? 'bg-orange-200 animate-pulse' : 'bg-white'} focus:outline-none`} aria-label="Speak Message">
+                   <Mic className={`h-4 w-4 ${isListening['message'] ? 'text-orange-600' : 'text-orange-400'}`} />
+                 </button>
                 </Label>
                 <Textarea
                   id="message"
-                  placeholder="Describe your need, offer, or announcement. Be specific about what you're looking for or offering..."
+                  placeholder={translations[language].yourMessage}
                   value={formData.message}
                   onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                   className={`min-h-32 resize-none border-orange-200 focus:ring-2 focus:ring-orange-400 text-black placeholder:text-orange-300 bg-orange-50 ${errors.message ? 'border-2 border-orange-500' : ''}`}
@@ -233,12 +343,12 @@ const Post = () => {
                 {isSubmitting ? (
                   <>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
-                    Posting...
+                    {translations[language].posting}
                   </>
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-2 text-white" />
-                    Post to Bazaar
+                    {translations[language].post}
                   </>
                 )}
               </Button>
@@ -247,12 +357,12 @@ const Post = () => {
         </Card>
         {/* Tips */}
         <div className="mt-8 p-4 bg-orange-50 rounded-lg border border-orange-200">
-          <h3 className="font-semibold text-orange-700 mb-2">💡 Tips for better notices:</h3>
+          <h3 className="font-semibold text-orange-700 mb-2">{translations[language].tips}</h3>
           <ul className="text-sm text-orange-700 space-y-1">
-            <li>• Be specific about quantities, timelines, and requirements</li>
-            <li>• Include contact preferences in your message</li>
-            <li>• Mention if you're flexible on pricing or terms</li>
-            <li>• Use clear, simple language that everyone can understand</li>
+            <li>{translations[language].tip1}</li>
+            <li>{translations[language].tip2}</li>
+            <li>{translations[language].tip3}</li>
+            <li>{translations[language].tip4}</li>
           </ul>
         </div>
       </div>
