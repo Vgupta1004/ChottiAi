@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCallback } from 'react';
 import { Search, Upload, ShoppingCart, Filter, Star, Heart, Camera, CreditCard, Truck, Shield, ArrowLeft, Plus, Minus } from 'lucide-react';
-import BackToHomeButton from "../components/BackToHomeButton";
 
 // Type definitions
 type Product = {
@@ -354,7 +353,6 @@ const MeeshoClone = () => {
         <img
           src={product.image}
           alt={product.name}
-          className="w-full object-contain"
         />
         <button
           onClick={() => toggleWishlist(product)}
@@ -365,13 +363,13 @@ const MeeshoClone = () => {
           />
         </button>
       </div>
-      <div className="p-3 flex-1 flex flex-col justify-between">
+      <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2 text-base">
+          <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2">
             {highlightMatch(product.name, debouncedSearch)}
           </h3>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg font-bold text-purple-600 text-base">₹{product.price}</span>
+            <span className="text-lg font-bold text-purple-600">₹{product.price}</span>
             <span className="text-xs text-gray-400 line-through">₹{product.originalPrice}</span>
             <span className="text-xs text-green-600 font-semibold">
               {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% off
@@ -386,13 +384,13 @@ const MeeshoClone = () => {
         <div className="flex gap-2 mt-2">
           <button
             onClick={() => addToCart(product)}
-            className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 font-semibold text-sm"
+            className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 font-semibold"
           >
             Add to Cart
           </button>
           <button
             onClick={() => setSelectedProduct(product)}
-            className="px-4 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 font-semibold text-sm"
+            className="px-4 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 font-semibold"
           >
             View
           </button>
@@ -565,7 +563,6 @@ const MeeshoClone = () => {
         setShowCart={setShowCart}
         cart={cart}
       />
-      <BackToHomeButton />
       <div className="flex relative">
         {/* FilterPanel: only visible when showFilters is true, overlays content */}
         {showFilters && <FilterPanel />}
@@ -584,7 +581,7 @@ const MeeshoClone = () => {
           {filteredProducts.length === 0 ? (
             <div className="text-center text-gray-400 text-lg font-semibold py-12">No products found.</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
